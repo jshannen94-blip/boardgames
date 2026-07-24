@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;background:#e6e5e1;font-family:'Libre Franklin',system-ui,sans-serif;color:#17161a;-webkit-font-smoothing:antialiased;}
+  a{color:#2f9e73;text-decoration:none;}
+  a:hover{color:#268560;}
+  input{font-family:inherit;}
+  @keyframes ovIn{from{opacity:0;}to{opacity:1;}}
+  @keyframes shIn{from{transform:translateY(28px);opacity:.3;}to{transform:translateY(0);opacity:1;}}
+</style>
+</helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#17161a"/><g><rect x="24" y="30" width="22" height="22" rx="5" fill="#2f9e73"/><rect x="54" y="30" width="22" height="22" rx="5" fill="#d1912f"/><rect x="24" y="60" width="22" height="22" rx="5" fill="#4a72d4"/><rect x="54" y="60" width="22" height="22" rx="5" fill="#3a3940"/></g></svg></template>
+<div class="app" data-screen-label="Board Games" style="max-width:480px;margin:0 auto;min-height:100vh;background:#f2f1ee;">
+
+  <div style="position:sticky;top:0;z-index:20;background:rgba(242,241,238,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:22px 16px 12px;">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:0 2px;">
+      <h1 style="margin:0;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:30px;letter-spacing:-1px;line-height:.95;">Board&nbsp;Games</h1>
+      <span style="flex-shrink:0;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:12px;color:#7a7873;background:#e6e5e1;border-radius:999px;padding:5px 11px;letter-spacing:.02em;">{{ total }} titles</span>
+    </div>
+    <div style="margin-top:14px;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:999px;padding:12px 16px;box-shadow:0 2px 10px rgba(0,0,0,.04);">
+      <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#a09d97;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input value="{{ query }}" onInput="{{ onSearch }}" placeholder="Search your collection…" autocomplete="off" style="flex:1;min-width:0;background:none;border:none;outline:none;color:#17161a;font-size:16px;">
+    </div>
+  </div>
+
+  <div style="padding:4px 16px 48px;">
+    <sc-if value="{{ searchActive }}" hint-placeholder-val="{{ true }}">
+      <div style="margin:6px 0 14px;background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:18px;padding:4px 16px;box-shadow:0 2px 10px rgba(0,0,0,.04);">
+        <sc-if value="{{ noHits }}" hint-placeholder-val="{{ true }}">
+          <div style="font-size:14px;color:#7a7873;font-style:italic;padding:16px 0;">No games match your search.</div>
+        </sc-if>
+        <sc-for list="{{ hits }}" as="hit" hint-placeholder-count="4">
+          <div onClick="{{ hit.onOpen }}" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-top:1px solid rgba(0,0,0,.05);cursor:pointer;">
+            <span style="font-size:15px;line-height:1.3;flex:1;min-width:0;">{{ hit.name }}</span>
+            <span style="{{ hit.badgeStyle }}">{{ hit.badge }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-for list="{{ shelves }}" as="shelf" hint-placeholder-count="3">
+      <div style="background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:22px;overflow:hidden;margin-bottom:13px;box-shadow:0 2px 12px rgba(0,0,0,.04);">
+        <div onClick="{{ shelf.toggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 15px;cursor:pointer;user-select:none;">
+          <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+            <span style="{{ shelf.tagStyle }}">{{ shelf.prefix }}</span>
+            <div style="min-width:0;">
+              <div style="font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:600;letter-spacing:-0.3px;line-height:1.1;">{{ shelf.name }}</div>
+              <div style="font-size:12px;color:#9a9791;margin-top:1px;">{{ shelf.metaLabel }}</div>
+            </div>
+          </div>
+          <span style="{{ shelf.chevStyle }}"><svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:#bdbab4;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;display:block;"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+        </div>
+        <sc-if value="{{ shelf.open }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:0 13px 15px;">
+            <div style="{{ shelf.gridStyle }}">
+              <sc-for list="{{ shelf.slots }}" as="slot" hint-placeholder-count="12">
+                <div onClick="{{ slot.onOpen }}" style="{{ slot.boxStyle }}">
+                  <div style="{{ slot.idStyle }}">{{ slot.id }}</div>
+                  <div style="display:flex;align-items:baseline;gap:3px;">
+                    <span style="{{ slot.numStyle }}">{{ slot.count }}</span>
+                    <span style="{{ slot.labelStyle }}">{{ slot.label }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+</div>
+
+<sc-if value="{{ sheet.open }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ sheet.close }}" style="position:fixed;inset:0;background:rgba(23,22,26,.46);display:flex;align-items:flex-end;justify-content:center;z-index:50;animation:ovIn .16s ease;">
+    <div onClick="{{ sheet.stop }}" style="width:100%;max-width:480px;background:#f2f1ee;border-radius:26px 26px 0 0;padding:12px 20px 34px;max-height:82vh;overflow:auto;animation:shIn .24s cubic-bezier(.2,.8,.25,1);">
+      <div style="width:40px;height:4px;border-radius:2px;background:#d3d0c9;margin:2px auto 18px;"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+          <span style="{{ sheet.tagStyle }}">{{ sheet.slotId }}</span>
+          <div style="min-width:0;">
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:600;letter-spacing:-0.4px;line-height:1;">{{ sheet.title }}</div>
+            <div style="margin-top:3px;font-size:12.5px;color:#9a9791;">{{ sheet.sub }}</div>
+          </div>
+        </div>
+        <button onClick="{{ sheet.closeX }}" aria-label="Close" style="flex-shrink:0;width:32px;height:32px;border-radius:999px;background:#e6e5e1;border:none;font-size:20px;line-height:1;color:#7a7873;cursor:pointer;">×</button>
+      </div>
+      <div style="margin-top:16px;">
+        <sc-if value="{{ sheet.empty }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:14px;color:#9a9791;font-style:italic;padding:16px 0;">No games in this slot.</div>
+        </sc-if>
+        <sc-for list="{{ sheet.games }}" as="g" hint-placeholder-count="0">
+          <div style="padding:14px 4px;border-top:1px solid rgba(0,0,0,.06);font-size:15.5px;line-height:1.3;">{{ g }}</div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:480,&quot;height&quot;:920},&quot;showSlotCounts&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Display&quot;},&quot;expandBehavior&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;First shelf&quot;,&quot;All shelves&quot;,&quot;Collapsed&quot;],&quot;default&quot;:&quot;First shelf&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Display&quot;}}">
+class Component extends DCLogic {
+  // ═══════════════════════════════════════════════════════════════
+  //  YOUR GAMES
+  //  ---------------------------------------------------------------
+  //  Each shelf slot (A1, A2 … C12) is a heading below, with its
+  //  games listed one per line underneath it.
+  //
+  //  TO ADD a game:     find the slot, add a new "Game Name" line.
+  //  TO REMOVE a game:  delete its line.
+  //  TO MOVE a game:    cut the line, paste it under the new slot.
+  //  Keep the quotes and the trailing comma on each line.
+  //  Slot letter = shelf (A / B / C), number = slot (1–12).
+  // ═══════════════════════════════════════════════════════════════
+  SLOT_GAMES = {
+
+    // ───────────  SHELF A · Landscape  ───────────
+    A1: [
+      "Tribes of the Wind",
+      "Marvel United + expansions",
+      "Marvel Zombies",
+      "Comic Hunters",
+    ],
+    A2: [
+      "Everdell",
+      "Raccoon Tycoon",
+      "Era + expansion",
+    ],
+    A3: [
+      "Spirit Island + expansions",
+      "Horseless Carriage",
+    ],
+    A4: [
+      "Dune Imperium",
+      "Gloomhaven- Jaws of the Lion",
+      "Sleeping Gods",
+    ],
+    A5: [
+      "Brass Birmingham",
+      "Let's Make a Bus Route",
+      "Foodchain Magnate + expansion",
+    ],
+    A6: [
+      "Tiny Towns",
+      "Super Mega Lucky Box",
+      "For Sale",
+      "Lunar",
+      "Point Salad",
+      "Point City",
+      "Azul",
+      "Radlands",
+      "Boss Monster + expansion",
+      "Cartographers Heroes",
+      "Tiny Epic Galaxies",
+    ],
+    A7: [
+      "Dominion: Plunder",
+      "Patchwork",
+      "The White Castle",
+      "Kanagawa",
+      "Canvas",
+    ],
+    A8: [
+      "Federation",
+      "Gaia Project + expansion",
+      "Twilight Inscription",
+    ],
+    A9: [
+      "Terra Nova",
+      "Parks",
+      "Gizmos",
+      "Power Grid",
+      "Sky Team",
+    ],
+    A10: [
+      "Meadow",
+      "The Isle of Cats + expansion",
+    ],
+    A11: [
+      "Challengers",
+      "Massive Darkness II",
+      "Thunderstone Quest",
+    ],
+    A12: [
+      "Dead Cells",
+      "Townsfolk Tussle",
+    ],
+
+    // ───────────  SHELF B · Window  ───────────
+    B1: [
+      "Quacks of Quedlinburg",
+      "Final Girl + expansions",
+      "Ra",
+      "Space Base",
+      "Legacy of Yu",
+    ],
+    B2: [
+      "Five Tribes",
+      "Container",
+      "Galactic Cruise",
+    ],
+    B3: [
+      "Summoner Wars",
+      "The Search For Lost Species",
+      "The Search For Planet X",
+      "Pandemic: Iberia",
+      "Castle Panic",
+    ],
+    B4: [
+      "It's a Wonderful World",
+      "Ezra and Nehemiah",
+      "Millenium Blades",
+      "Mage Knight",
+    ],
+    B5: [
+      "Mansions of Madness",
+      "Sub Terra",
+      "Betrayal at House on the Hill",
+    ],
+    B6: [
+      "Memoir 44",
+      "Undaunted",
+      "Warfighter",
+      "Mr. President + expansions",
+    ],
+    B7: [
+      "Tokaido",
+      "Kanban EV",
+      "Eclipse",
+    ],
+    B8: [
+      "Slay the Spire",
+      "A Feast for Odin + expansion",
+      "Gloomhaven: Forgotten Circles",
+      "Le Havre",
+    ],
+    B9: [
+      "Heat: Pedal to the Metal",
+      "Twilight Struggle + Red Sea",
+      "Thunder Road Vendetta",
+    ],
+    B10: [
+      "Dominion Expansions",
+    ],
+    B11: [
+      "Star Realms Legacy",
+      "Wingspan Asia + Oceania expansion",
+    ],
+    B12: [
+      "Shackleton Base",
+      "SETI + expansion",
+      "Ark Nova + expansion",
+    ],
+
+    // ───────────  SHELF C · TV  ───────────
+    C1: [
+      "Flamecraft",
+      "QE",
+      "Long Shot",
+      "Merchants Cove",
+    ],
+    C2: [
+      "Stardew Valley: The Board Game",
+      "T.I.M.E Stories + expansions",
+    ],
+    C3: [
+      "Carcassonne",
+      "Ticket to Ride",
+      "Project L",
+      "Ten",
+      "Ultimate Aquarium",
+      "Bananagrams",
+      "Skull(old copy)",
+      "Skulls of Sedlec",
+      "Lacuna",
+      "Star Realms Mini",
+      "Monopoly Duel",
+      "Hanabi",
+      "Tussie Mussie",
+      "The Crew: Mission Deep Sea",
+      "Splendor Duel",
+      "Wizard",
+      "Mancala",
+    ],
+    C4: [
+      "Project Elite + expansions",
+      "Earth + Expansion",
+    ],
+    C5: [
+      "Marvel Champions - Complete Collection",
+      "Battlestar Galactica",
+    ],
+    C6: [
+      "Unmatched: Tales to Amaze",
+      "Air Land and Sea",
+      "Getaway Driver",
+      "Agricola: All Creatures Big and Small",
+      "Blitzkrieg",
+      "Dogfight",
+      "Curious Cargo",
+    ],
+    C7: [
+      "Star Wars: The Mandalorian Adventures",
+      "Bounty Hunters",
+      "Star Wars: The Deckbuilding Game + expansions",
+      "Star Wars: Destiny",
+      "Star Wars: X-Wing",
+      "Star Wars: Battle of Hoth",
+    ],
+    C8: [
+      "Mistborn: The Deckbuilding Game",
+      "Western Legends + expansions",
+    ],
+    C9: [
+      "Clank! Catacombs + expansions",
+      "Shards of Infinity",
+      "Lord of the Rings Duel",
+      "Onitama",
+      "Under Falling Skies",
+      "Clank! Acquisitions Incorporated",
+      "Fallout Shelter: The Board Game",
+      "Crime Unfolds",
+      "Skull",
+    ],
+    C10: [
+      "Star Wars: Shatterpoint",
+      "Star Wars: Outer Rim",
+      "Star Wars: The Clone Wars",
+    ],
+    C11: [
+      "Halo Flashpoint",
+      "Board Game Inserts",
+      "Board Game Rule Books",
+      "Board Game Misc Pieces",
+    ],
+    C12: [
+      "Jenga",
+      "Jingle All The Way",
+      "Ransom Notes",
+      "Monopoly Deal",
+      "Battleship Card Game",
+      "Chess",
+      "Mancala",
+      "Exit: The Abandoned Cabin",
+      "Codenames: Duet",
+      "Tapple",
+      "Clue",
+      "Cranium",
+    ],
+
+  };
+
+  // Flattens SLOT_GAMES into the [name, slot] pairs the rest of the
+  // app expects. You shouldn't need to touch this.
+  get games(){
+    const out = [];
+    for(const slot in this.SLOT_GAMES){
+      for(const name of this.SLOT_GAMES[slot]) out.push([name, slot]);
+    }
+    return out;
+  }
+
+  SHELVES = {
+    A:{name:'Shelf A',place:'Landscape',color:'#2f9e73',ink:'#268560',tint:'rgba(47,158,115,0.10)',line:'rgba(47,158,115,0.28)',selBg:'rgba(47,158,115,0.20)'},
+    B:{name:'Shelf B',place:'Window',color:'#d1912f',ink:'#a5721f',tint:'rgba(209,145,47,0.12)',line:'rgba(209,145,47,0.32)',selBg:'rgba(209,145,47,0.22)'},
+    C:{name:'Shelf C',place:'TV',color:'#4a72d4',ink:'#3a5fc0',tint:'rgba(74,114,212,0.10)',line:'rgba(74,114,212,0.28)',selBg:'rgba(74,114,212,0.20)'}
+  };
+  ORDER = ['A','B','C'];
+  SLOTS = 12;
+  state = { open:null, query:'', slot:null, selected:null };
+
+  getOpen(){
+    if(this.state.open) return this.state.open;
+    const b = this.props.expandBehavior || 'First shelf';
+    if(b==='All shelves') return {A:true,B:true,C:true};
+    if(b==='Collapsed') return {A:false,B:false,C:false};
+    return {A:true,B:false,C:false};
+  }
+  haptic(ms){ try{ if(navigator.vibrate) navigator.vibrate(ms); }catch(e){} }
+  toggleShelf(p){ this.haptic(12); const cur=this.getOpen(); this.setState({open:{...cur,[p]:!cur[p]}}); }
+  openSlot(id){ this.haptic(15); const cur=this.getOpen(); this.setState({slot:id, selected:id, open:{...cur,[id[0]]:true}}); }
+  closeSlot(){ this.setState({slot:null}); }
+  closeSlotTap(){ this.haptic(8); this.setState({slot:null}); }
+  onSearch(e){ this.setState({query:e.target.value}); }
+
+  slotMap(){ return this.SLOT_GAMES; }
+  tag(cfg){ return {display:'flex',alignItems:'center',justifyContent:'center',width:'34px',height:'34px',flexShrink:0,borderRadius:'11px',background:cfg.color,color:'#fff',fontFamily:"'Space Grotesk',sans-serif",fontWeight:700,fontSize:'15px',letterSpacing:'-0.5px'}; }
+
+  renderVals(){
+    const showCounts = this.props.showSlotCounts ?? true;
+    const map = this.slotMap();
+    const openMap = this.getOpen();
+    const badgeBase = {fontFamily:"'Space Grotesk',sans-serif",fontSize:'12px',fontWeight:600,whiteSpace:'nowrap',flexShrink:0};
+
+    const shelves = this.ORDER.map(prefix=>{
+      const cfg = this.SHELVES[prefix];
+      const total = this.games.filter(g=>g[1][0]===prefix).length;
+      const open = !!openMap[prefix];
+      const slots = [];
+      for(let i=1;i<=this.SLOTS;i++){
+        const id = prefix+i;
+        const entries = map[id]||[];
+        const has = entries.length>0;
+        const sel = id===this.state.selected;
+        slots.push({
+          id, hasGames:has,
+          count: showCounts ? (has ? String(entries.length) : '') : '',
+          label: showCounts ? (has ? (entries.length>1?'games':'game') : 'empty') : '',
+          boxStyle: {minHeight:'74px',borderRadius:'15px',padding:'11px 11px 10px',display:'flex',flexDirection:'column',justifyContent:'space-between',cursor:'pointer',transition:'box-shadow .15s,background .15s',
+            background: sel ? cfg.selBg : (has?cfg.tint:'transparent'),
+            boxShadow: sel ? ('inset 0 0 0 2px '+cfg.color+', 0 5px 14px '+cfg.color+'33') : (has?'none':'inset 0 0 0 1.5px '+cfg.line)},
+          idStyle: {fontFamily:"'Space Grotesk',sans-serif",fontSize:'15px',fontWeight:700,letterSpacing:'-0.3px',lineHeight:'1',color: has?cfg.ink:'#b6b3ad'},
+          numStyle: {fontFamily:"'Space Grotesk',sans-serif",fontSize:'12px',fontWeight:600,lineHeight:'1',color: has?cfg.ink:'#c4c1bb'},
+          labelStyle: {fontSize:'10.5px',fontWeight:500,color: has?cfg.ink:'#c4c1bb',opacity: has?.7:1},
+          onOpen: ()=>this.openSlot(id)
+        });
+      }
+      return {
+        prefix, name:cfg.name, open,
+        metaLabel: cfg.place+' · '+total+' games',
+        gridStyle: {display:'grid',gridTemplateColumns:'repeat('+(prefix==='A'?4:3)+',1fr)',gap:'8px'},
+        tagStyle: this.tag(cfg),
+        chevStyle: {display:'inline-flex',transition:'transform .2s',transform: open?'rotate(180deg)':'rotate(0deg)'},
+        toggle: ()=>this.toggleShelf(prefix),
+        slots
+      };
+    });
+
+    const q = this.state.query.trim().toLowerCase();
+    const searchActive = q.length>0;
+    let hits = [];
+    if(searchActive){
+      hits = this.games
+        .filter(g=>g[0].toLowerCase().indexOf(q)>=0)
+        .sort((a,b)=>a[0].localeCompare(b[0]))
+        .slice(0,60)
+        .map(g=>{
+          const cfg=this.SHELVES[g[1][0]];
+          return {name:g[0], loc:g[1], badge:g[1], badgeStyle:{...badgeBase,color:cfg.ink,background:cfg.tint,borderRadius:'999px',padding:'4px 10px'}, onOpen:()=>this.openSlot(g[1])};
+        });
+    }
+
+    let sheet = {open:false, games:[], title:'', sub:'', slotId:'', empty:false, tagStyle:{}};
+    if(this.state.slot){
+      const id = this.state.slot;
+      const cfg = this.SHELVES[id[0]];
+      const list = (map[id]||[]).slice().sort((a,b)=>a.localeCompare(b));
+      sheet = {
+        open:true, slotId:id, title:'Slot '+id, sub:cfg.name+' — '+cfg.place,
+        tagStyle:this.tag(cfg),
+        games:list, empty:list.length===0,
+        close:()=>this.closeSlot(), closeX:()=>this.closeSlotTap(), stop:(e)=>e.stopPropagation()
+      };
+    }
+
+    return {
+      query:this.state.query, onSearch:(e)=>this.onSearch(e),
+      searchActive, hits, noHits: searchActive && hits.length===0,
+      total:this.games.length, shelves, sheet
+    };
+  }
+}
+</script>
+</body>
+</html>
